@@ -7,18 +7,17 @@ global DEBUG_DRAW_EVERY;
 global TRAIN_DATA_DIRECTORY;
 global TRAIN_DATA_SIZE;
 global TRAIN_DATA_CLASS_INDEX;
-global LOAD_DATA_ENABLED;
 DEBUG = 1;
-DEBUG_DRAW_EVERY = 11;
+DEBUG_DRAW_EVERY = 1;
 TRAIN_DATA_DIRECTORY = "training_data";
 TRAIN_DATA_SIZE = 1000;
 TRAIN_DATA_CLASS_INDEX = 8;
-LOAD_DATA_ENABLED = 0;
+LOAD_DATA_ENABLED = true;
 
 
 
 % Run data fetcher.
-if LOAD_DATA_ENABLED == 1
+if LOAD_DATA_ENABLED
     [data, classes, max_length] = load_data();
 end
 

@@ -36,9 +36,13 @@ function debug_draw_pixels(data, classes)
         % Get one sample from data using index.
         entry = subset_data{data_index};
         % Move to next subplot.
-        subplot(subplot_dimension, subplot_dimension, subplot_index)
+        subaxis(subplot_dimension, subplot_dimension, subplot_index, 'Spacing', 0.01, 'Padding', 0, 'Margin', 0.02);
+
         % Plot new image to sub plot.
         image(rot90(entry * 255))
+
+        axis tight
+        axis off
         % Update sub plot index.
         subplot_index = subplot_index + 1;
     end
