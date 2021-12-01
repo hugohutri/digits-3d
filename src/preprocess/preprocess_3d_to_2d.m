@@ -1,4 +1,4 @@
-function flat_data = preprocess_three_d_to_two_d(data)
+function flat_data = preprocess_3d_to_2d(data)
     % Prepare flat data output by assigning certain size table.
     flat_data = cell(length(data), 1, 1);
     

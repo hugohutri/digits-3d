@@ -11,7 +11,7 @@ function processed_data = preprocess(raw_data, justified_size, image_dimensions)
     flattened_data = preprocess_project_data(zero_cleaned_data, projection_matrix);
 
     % Do simple 3D to 2D conversion.
-    % flattened_data = preprocess_three_d_to_two_d(zero_cleaned_data);
+    % flattened_data = preprocess_3d_to_2d(zero_cleaned_data);
 
     % Stretch data so that it has same time intervals.
     justified_data = preprocess_justify_data(flattened_data, justified_size);
