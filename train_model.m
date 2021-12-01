@@ -14,7 +14,7 @@ global TRAIN_DATA_CLASS_INDEX;
 DEBUG = 1;
 DEBUG_DRAW_EVERY = 4;
 DEBUG_DRAW_CLASSES = [3, 4, 5];
-TRAIN_DATA_DIRECTORY = "training_data";
+TRAIN_DATA_DIRECTORY = "data/training_data";
 TRAIN_DATA_SIZE = 1000;
 TRAIN_DATA_CLASS_INDEX = 8; % This value should not be changed for the data set.
 LOAD_DATA_ENABLED = true;
@@ -35,3 +35,5 @@ debug_draw_pixels(preprocessed_data, classes)
 
 % Draw output as vectors.
 % debug_draw_vectors(preprocessed_data, classes)
+
+save_data(preprocessed_data, "data/preprocessed", "test1.mat")
