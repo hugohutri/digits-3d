@@ -1,5 +1,5 @@
 close all
-%clear all
+% clear all
 clc
 
 % Add all new files in src folder automatically to the path
@@ -13,18 +13,19 @@ global TRAIN_DATA_SIZE;
 global TRAIN_DATA_CLASS_INDEX;
 DEBUG = 1;
 DEBUG_DRAW_EVERY = 4;
-DEBUG_DRAW_CLASSES = [6];
+DEBUG_DRAW_CLASSES = [3, 4, 5];
 TRAIN_DATA_DIRECTORY = "training_data";
 TRAIN_DATA_SIZE = 1000;
-TRAIN_DATA_CLASS_INDEX = 8;
+TRAIN_DATA_CLASS_INDEX = 8; % This value should not be changed for the data set.
 LOAD_DATA_ENABLED = true;
-
-
 
 % Run data fetcher.
 if LOAD_DATA_ENABLED
     [data, classes, max_length] = load_data(TRAIN_DATA_DIRECTORY);
 end
+
+% Filter only specific number (used for testing).
+% [data, classes] = debug_filter_data(data, classes, 9);
 
 % Preprocess.
 preprocessed_data = preprocess(data, 1000, 24);
@@ -33,4 +34,4 @@ preprocessed_data = preprocess(data, 1000, 24);
 debug_draw_pixels(preprocessed_data, classes)
 
 % Draw output as vectors.
-% debug_draw_vectors(normalized_data)
+% debug_draw_vectors(preprocessed_data, classes)

@@ -1,6 +1,6 @@
 function pixelized_data = preprocess_pixelizer(data, dimensions)
     % Dimensions should be 1 smaller.
-    dimensions = dimensions - 1;
+    round_dimensions = dimensions - 1;
 
     % Prepare pixelized data output by assigning certain size table.
     pixelized_data = cell(length(data), 1, 1);
@@ -40,18 +40,26 @@ function pixelized_data = preprocess_pixelizer(data, dimensions)
             x_dir = ceilfix(x_diff);
             y_dir = ceilfix(y_diff);
 
-            pixel_matrix(x, y) = 1; %min(1 - x_diff^2 - y_diff^2, 1);
-            % try
-            %     pixel_matrix(x+x_dir, y) = min(pixel_matrix(x+x_dir, y) + sqrt(abs(x_diff)), 1);
-            % end
-            % try
-            %     pixel_matrix(x, y+y_dir) = min(pixel_matrix(x, y+y_dir) + sqrt(abs(y_diff)), 1);
-            % end
-            % try
-            %     pixel_matrix(x+x_dir, y) = min(pixel_matrix(x+x_dir, y+y_dir) + sqrt(abs(x_diff)) + sqrt(abs(y_diff)), 1);
-            % end
+            pixel_matrix(x, y) = 1;
+            try
+                pixel_matrix(x+x_dir, y) = max(pixel_matrix(x+x_dir, y), 2*(abs(x_diff)));
+            end
+            try
+                pixel_matrix(x, y+y_dir) = max(pixel_matrix(x, y+y_dir), 2*(abs(y_diff)));
+            end
+            try
+                pixel_matrix(x+x_dir, y+y_dir) = max(pixel_matrix(x+x_dir, y+y_dir), 2*hypot(x_diff, y_diff));
+            end
+
+            % % Anti-aliasing by roni
+            % x = round(entry_point(1) * round_dimensions) + 1;
+            % y = round(entry_point(2) * round_dimensions) + 1;
+            % pixel_matrix(x, y) = pixel_matrix(x, y) + 1;
         end
         
+        % Limit the values between 0 and 1
+        pixel_matrix(pixel_matrix>1) = 1;
+
         % Add pixel matrix to pixelized data table.
         pixelized_data{data_index} = pixel_matrix;
     end
