@@ -2,13 +2,15 @@ close all
 %clear all
 clc
 
+addpath(genpath("src"))
+
 global DEBUG;
 global DEBUG_DRAW_EVERY;
 global TRAIN_DATA_DIRECTORY;
 global TRAIN_DATA_SIZE;
 global TRAIN_DATA_CLASS_INDEX;
 DEBUG = 1;
-DEBUG_DRAW_EVERY = 1;
+DEBUG_DRAW_EVERY = 4;
 TRAIN_DATA_DIRECTORY = "training_data";
 TRAIN_DATA_SIZE = 1000;
 TRAIN_DATA_CLASS_INDEX = 8;
