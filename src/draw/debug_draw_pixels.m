@@ -1,7 +1,8 @@
 function debug_draw_pixels(data, classes)
     global DEBUG;
     global DEBUG_DRAW_EVERY;
-    
+    global DEBUG_DRAW_CLASSES;
+
     if (DEBUG ~= 1)
         return;
     end
@@ -15,14 +16,20 @@ function debug_draw_pixels(data, classes)
     end
     subset_classes = classes(1:DEBUG_DRAW_EVERY:end);
     
-    % Set to some fake class that is not realistic.
-    previous_class = -1000;
+    previous_class = NaN;
      % Go through all the data points.
     for data_index = 1:length(subset_data)
+        current_class = subset_classes(data_index);
+
+        % Draw only specific classes
+        if (~ismember(current_class, DEBUG_DRAW_CLASSES))
+            continue
+        end
+
         % Change plot
-        if (previous_class ~= subset_classes(data_index))
+        if (previous_class ~= current_class)
             % Set new class as previous class.
-            previous_class = subset_classes(data_index);
+            previous_class = current_class;
             % Calculate new sample amount.
             sample_amount = sum(subset_classes(:) == previous_class);
             % Create new figure.

@@ -1,9 +1,8 @@
-function [data, classes, max_length] = load_data()
-    global TRAIN_DATA_DIRECTORY;
+function [data, classes, max_length] = load_data(path_to_data)
     global TRAIN_DATA_SIZE;
     global TRAIN_DATA_CLASS_INDEX;
 
-    files = dir(TRAIN_DATA_DIRECTORY);
+    files = dir(path_to_data);
     
     data = cell(TRAIN_DATA_SIZE, 1, 1);
     classes = zeros(TRAIN_DATA_SIZE, 1);
@@ -24,7 +23,7 @@ function [data, classes, max_length] = load_data()
         classes(data_index) = class;
         
         % Load file
-        full_file_name = TRAIN_DATA_DIRECTORY + "/" + file;
+        full_file_name = path_to_data + "/" + file;
         load(full_file_name, "pos");
         data{data_index} = pos;
         
