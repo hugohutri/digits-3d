@@ -47,6 +47,7 @@ function debug_draw_pixels(data, classes)
 
         % Plot new image to sub plot.
         image(rot90(entry * 255))
+        colormap(gray);
 
         axis tight
         axis off
