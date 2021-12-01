@@ -114,7 +114,7 @@ for epoch = 1:max_iter
         % 20 purely random children
         child_list_5 = create_children(base_NN, 20, 100, [-1e1, 1e1], false);
         
-        child_list = [child_list_1, child_list_2, child_list_3, child_list_4];
+        child_list = [child_list_1, child_list_2, child_list_3, child_list_4, child_list_5];
     end
     
     
@@ -180,7 +180,7 @@ for epoch = 1:max_iter
                         (1 - (B(1:3) ./ number_of_train)) * 100)
     fprintf("Time taken: %0.3fs\n\n", t_delta)
     
-    save("top.mat", "top_children")
+    save("best_child.mat", "best_child")
     
 end
 
