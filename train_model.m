@@ -13,7 +13,7 @@ global TRAIN_DATA_SIZE;
 global TRAIN_DATA_CLASS_INDEX;
 DEBUG = 1;
 DEBUG_DRAW_EVERY = 4;
-DEBUG_DRAW_CLASSES = [3, 4, 5];
+DEBUG_DRAW_CLASSES = [];
 TRAIN_DATA_DIRECTORY = "data/training_data";
 TRAIN_DATA_SIZE = 1000;
 TRAIN_DATA_CLASS_INDEX = 8; % This value should not be changed for the data set.
