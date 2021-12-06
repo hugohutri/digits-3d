@@ -77,8 +77,8 @@ test_class = sample_class(:, ~suffle);
 % input_size = 625;
 input_size = PIXEL_AMOUNT;
 
-hidden_size = 256;
-hidden_layers = 6;
+hidden_size = 160; % 256;
+hidden_layers = 3; % 6;
 
 output_size = 10;
 
@@ -102,6 +102,7 @@ min_learn_rate = 0.001;
 
 
 for epoch = 1:max_iter
+    fprintf("Starting epoch\n")
 
     % Start timer
     t_start = tic;
@@ -110,9 +111,13 @@ for epoch = 1:max_iter
     child_scores = zeros(1, child_count);
 
     if epoch == 1
+        fprintf("Creating children\n")
         % Create_children(parent, child_count, learn_rate, limits, use_gauss)
         child_list = create_children(base_NN, child_count, learn_rate, [-1e1, 1e1], false);
+        fprintf("Children created\n")
+
     else
+        fprintf("Creating children\n")
         % Create_children(parent, child_count, learn_rate, limits, use_gauss)
         % TODO: ratios are hard coded
         child_list_1 = create_children(top_children(1), 50, learn_rate);
@@ -124,13 +129,16 @@ for epoch = 1:max_iter
         child_list_5 = create_children(base_NN, 20, 100, [-1e1, 1e1], false);
 
         child_list = [child_list_1, child_list_2, child_list_3, child_list_4, child_list_5];
+        fprintf("Children created\n")
     end
 
 
 
     % Evaluate each child
-    for n = 1:child_count
+    fprintf("Evaluating each children\n")
+    parfor n = 1:child_count
 
+        % fprintf("Evaluating child %d\n", n)
         child = child_list(n);
         error_sum = 0;
 
@@ -143,7 +151,7 @@ for epoch = 1:max_iter
 
             % If it's not correct
             if I ~= train_class(m)
-               error_sum = error_sum +1;
+               error_sum = error_sum + 1;
             % else
 
                 % imshow(reshape(train_data(:, m), [16 16]))
@@ -155,6 +163,8 @@ for epoch = 1:max_iter
         error_sum;
         child_scores(n) = error_sum;
     end
+    fprintf("Children evaluated\n")
+
 
 
 
