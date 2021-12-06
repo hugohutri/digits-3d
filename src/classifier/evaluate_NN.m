@@ -1,3 +1,4 @@
+
 function result = evaluate_NN(child, input)
 
     arguments
@@ -23,8 +24,8 @@ function result = evaluate_NN(child, input)
     % activ_fun = @(X) tanh(X);
     
     % RELU
-    % activ_fun = @(X) max(zeros(size(X)), X);
-    activ_fun = @(X) max(zeros(size(X)), tanh(X));
+    activ_fun = @(X) max(zeros(size(X)), X); % This seems to be better
+    % activ_fun = @(X) max(zeros(size(X)), tanh(X));
     
     
     
@@ -44,6 +45,7 @@ function result = evaluate_NN(child, input)
     current = input * child.weights_in;
     current = current + child.bias_in;
     current = activ_fun(current);
+    
     
     layer_N = length(child.weights_hidden(1, 1, :));
     

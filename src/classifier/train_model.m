@@ -100,7 +100,9 @@ best_child_score = number_of_train;
 learn_rate = 100;
 min_learn_rate = 0.001;
 
+% List for monitoring performance etc
 best_epoch_accuracies = [];
+epoch_durations = [];
 
 for epoch = 1:max_iter
     fprintf("Starting epoch\n")
@@ -112,10 +114,10 @@ for epoch = 1:max_iter
     child_scores = zeros(1, child_count);
 
     if epoch == 1
-        fprintf("Creating children\n")
+        % fprintf("Creating children\n")
         % Create_children(parent, child_count, learn_rate, limits, use_gauss)
         child_list = create_children(base_NN, child_count, learn_rate, [-1e1, 1e1], false);
-        fprintf("Children created\n")
+        % fprintf("Children created\n")
 
     else
         child_list = create_all_children(top_children, best_child, learn_rate, base_NN);
@@ -138,7 +140,7 @@ for epoch = 1:max_iter
 
 
     % Evaluate each child
-    fprintf("Evaluating each children\n")
+    % fprintf("Evaluating each children\n")
     parfor n = 1:child_count
 
         % fprintf("Evaluating child %d\n", n)
@@ -166,7 +168,7 @@ for epoch = 1:max_iter
         error_sum;
         child_scores(n) = error_sum;
     end
-    fprintf("Children evaluated\n")
+    % fprintf("Children evaluated\n")
 
 
 
@@ -200,13 +202,32 @@ for epoch = 1:max_iter
     fprintf("Epoch: %d/%d, with learn rate: %0.3f\n", epoch, max_iter, learn_rate)
     top_accuracies = (1 - (B(1:3) ./ number_of_train)) * 100;
     fprintf("Top accuracies: %0.1f%%, %0.1f%%, %0.1f%%\n",top_accuracies)
-    fprintf("Time taken: %0.3fs\n\n", t_delta)
+    fprintf("Time taken: %0.3fs\n", t_delta)
+    epoch_durations = [epoch_durations t_delta];
+    average_epoch_duration = mean(epoch_durations);
+    fprintf("Average epoch duration: %0.3fs\n", average_epoch_duration)
+
+    fprintf("\n")
 
     save("best_child.mat", "best_child")
 
+    % PLOTTING
+
     best_epoch_accuracies = [best_epoch_accuracies, top_accuracies(1)];
     hold on;
+    
+    % Plot accuracy
+    subplot(2,1,1);
     plot(1:epoch, best_epoch_accuracies, "b");
+    title("Accuracy");
+    ylabel("%");
+    
+    % Plot time taken per epoch
+    subplot(2,1,2);
+    plot(1:epoch, epoch_durations, "b");
+    title("Epoch duration");
+    ylabel("seconds");
+
     drawnow;
 end
 
