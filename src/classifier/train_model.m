@@ -89,7 +89,7 @@ base_NN = create_NN(input_size, hidden_size, hidden_layers, output_size);
 max_iter = 600;
 
 child_count = 110;
-num_top_child = 3;
+num_top_child = 50; %3;
 top_children = Child.empty(num_top_child, 0);
 
 % Overall best child ever created
@@ -117,19 +117,21 @@ for epoch = 1:max_iter
         fprintf("Children created\n")
 
     else
-        fprintf("Creating children\n")
-        % Create_children(parent, child_count, learn_rate, limits, use_gauss)
-        % TODO: ratios are hard coded
-        child_list_1 = create_children(top_children(1), 50, learn_rate);
-        child_list_2 = create_children(top_children(2), 20, learn_rate);
-        child_list_3 = create_children(top_children(3), 10, learn_rate);
-        % Best child has 10 children
-        child_list_4 = create_children(best_child, 10, learn_rate * 0.1);
-        % 20 purely random children
-        child_list_5 = create_children(base_NN, 20, 100, [-1e1, 1e1], false);
+        child_list = create_all_children(top_children, best_child, learn_rate, base_NN);
+        % fprintf("Creating children\n")
+        % % Create_children(parent, child_count, learn_rate, limits, use_gauss)
+        % % TODO: ratios are hard coded
+        
+        % child_list_1 = create_children(top_children(1), 50, learn_rate);
+        % child_list_2 = create_children(top_children(2), 20, learn_rate);
+        % child_list_3 = create_children(top_children(3), 10, learn_rate);
+        % % Best child has 10 children
+        % child_list_4 = create_children(best_child, 10, learn_rate * 0.1);
+        % % 20 purely random children
+        % child_list_5 = create_children(base_NN, 20, 100, [-1e1, 1e1], false);
 
-        child_list = [child_list_1, child_list_2, child_list_3, child_list_4, child_list_5];
-        fprintf("Children created\n")
+        % child_list = [child_list_1, child_list_2, child_list_3, child_list_4, child_list_5];
+        % fprintf("Children created\n")
     end
 
 
@@ -173,7 +175,7 @@ for epoch = 1:max_iter
 
     top_children = child_list( I(1:num_top_child) );
 
-    learn_rate = min_learn_rate * B(1) * 0.1;
+    learn_rate = min_learn_rate * B(1) * 0.5; % 0.1;
 
     if B(1) < best_child_score
 
@@ -193,7 +195,7 @@ for epoch = 1:max_iter
         fprintf("Estimated complete duration %s hh:mm\n\n", full_duration);
     end
 
-    fprintf('[%s]\n', datestr(now,'hh:mm:ss'))
+    fprintf('[%s]\n', datestr(now,'hh:MM:ss'))
     fprintf("Epoch: %d/%d, with learn rate: %0.3f\n", epoch, max_iter, learn_rate)
     fprintf("Top accuracies: %0.1f%%, %0.1f%%, %0.1f%%\n",...
                         (1 - (B(1:3) ./ number_of_train)) * 100)
