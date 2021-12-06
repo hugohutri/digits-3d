@@ -1,4 +1,4 @@
-function save_data(data_to_be_saved, path, filename)
+function save_data(data_to_be_saved, classes, path, filename)
     full_file_name = path + "/" + filename; 
 
     % Create a matrix where 
@@ -11,5 +11,5 @@ function save_data(data_to_be_saved, path, filename)
     end
 
     size_of_saved_file = size(data)
-    save(full_file_name, 'data')       
+    save(full_file_name, 'data', "classes")       
 end

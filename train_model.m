@@ -36,4 +36,4 @@ debug_draw_pixels(preprocessed_data, classes)
 % Draw output as vectors.
 % debug_draw_vectors(preprocessed_data, classes)
 
-save_data(preprocessed_data, "data/preprocessed", "test1.mat")
+save_data(preprocessed_data, classes', "data/preprocessed", "test1.mat")
