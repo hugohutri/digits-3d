@@ -100,6 +100,7 @@ best_child_score = number_of_train;
 learn_rate = 100;
 min_learn_rate = 0.001;
 
+best_epoch_accuracies = [];
 
 for epoch = 1:max_iter
     fprintf("Starting epoch\n")
@@ -175,7 +176,7 @@ for epoch = 1:max_iter
 
     top_children = child_list( I(1:num_top_child) );
 
-    learn_rate = min_learn_rate * B(1) * 0.5; % 0.1;
+    learn_rate = min_learn_rate * B(1) * 2; % 0.1;
 
     if B(1) < best_child_score
 
@@ -197,11 +198,15 @@ for epoch = 1:max_iter
 
     fprintf('[%s]\n', datestr(now,'hh:MM:ss'))
     fprintf("Epoch: %d/%d, with learn rate: %0.3f\n", epoch, max_iter, learn_rate)
-    fprintf("Top accuracies: %0.1f%%, %0.1f%%, %0.1f%%\n",...
-                        (1 - (B(1:3) ./ number_of_train)) * 100)
+    top_accuracies = (1 - (B(1:3) ./ number_of_train)) * 100;
+    fprintf("Top accuracies: %0.1f%%, %0.1f%%, %0.1f%%\n",top_accuracies)
     fprintf("Time taken: %0.3fs\n\n", t_delta)
 
     save("best_child.mat", "best_child")
 
+    best_epoch_accuracies = [best_epoch_accuracies, top_accuracies(1)];
+    hold on;
+    plot(1:epoch, best_epoch_accuracies, "b");
+    drawnow;
 end
 
