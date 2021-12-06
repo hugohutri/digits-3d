@@ -4,17 +4,17 @@ clc; clearvars; close all;
 % load('usps_all');
 
 % load("USPS.mat")
-load("../../data/preprocessed/test1.mat")
+load("../../data/preprocessed/data_24.mat")
 
-
-
+PIXEL_AMOUNT = height(data);
+IMAGE_DIMENSIONS = sqrt(PIXEL_AMOUNT);
 
 % This part of code is just using the 'usps_all' data. Will be removed in
 % the future.
 
 
 
-sample_of_each = 400;
+sample_of_each = 80; % 400
 data_size = sample_of_each * 10;
 
 sample_data  = [];
@@ -22,15 +22,23 @@ sample_class = [];
 
 for cls = 1:10
 
-    data_group = [];
-    for n = 1:sample_of_each
+    % data_group = [];
+    % class_group = [];
+    % for n = 1:sample_of_each
+    %     data_group = [data_group, data(:, n)];
+    %     class_group = [class_group, classes(n)];
+    % end
 
-        data_group = [data_group, data(:, n, cls)];
-    end
+        
 
-    sample_data = [sample_data, data_group];
+    % sample_data = [sample_data, data_group];
 
-    sample_class = [sample_class, ones(1, sample_of_each) * cls];
+    % sample_class = [sample_class, class_group];
+    % sample_class = [sample_class, ones(1, sample_of_each) * cls];
+    data_group = data(:,classes == cls);
+    sample_data = [sample_data data_group(:,1:sample_of_each)];
+    sample_class = [sample_class ones(1, sample_of_each) * cls];
+
 end
 
 %example = reshape(sample_data(:, sample_of_each * 9 -10), [16 16]);
@@ -42,7 +50,7 @@ end
 %% The real training part begings here
 
 
-number_of_train = 2000;
+number_of_train = 800; % 2000;
 
 
 % Suffling the data to train and test
@@ -60,13 +68,14 @@ test_class = sample_class(:, ~suffle);
 
 
 
-%n = 400;
-%example = reshape(train_data(:, n), [16 16]);
-%fprintf("Is number: %d\n", train_class(n))
-%imshow(example)
+% n = 799;
+% example = reshape(train_data(:, n), [IMAGE_DIMENSIONS IMAGE_DIMENSIONS]);
+% fprintf("Is number: %d\n", train_class(n))
+% imshow(example)
 
 
-input_size = 256;
+% input_size = 625;
+input_size = PIXEL_AMOUNT;
 
 hidden_size = 256;
 hidden_layers = 6;

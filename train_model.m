@@ -13,7 +13,7 @@ global TRAIN_DATA_SIZE;
 global TRAIN_DATA_CLASS_INDEX;
 DEBUG = 1;
 DEBUG_DRAW_EVERY = 4;
-DEBUG_DRAW_CLASSES = [];
+DEBUG_DRAW_CLASSES = 0:2;
 TRAIN_DATA_DIRECTORY = "data/training_data";
 TRAIN_DATA_SIZE = 1000;
 TRAIN_DATA_CLASS_INDEX = 8; % This value should not be changed for the data set.
@@ -28,7 +28,8 @@ end
 % [data, classes] = debug_filter_data(data, classes, 9);
 
 % Preprocess.
-preprocessed_data = preprocess(data, 1000, 24);
+DIMENSIONS = 16; % px
+preprocessed_data = preprocess(data, 1000, DIMENSIONS);
 
 % Draw output as pixels.
 debug_draw_pixels(preprocessed_data, classes)
@@ -36,4 +37,10 @@ debug_draw_pixels(preprocessed_data, classes)
 % Draw output as vectors.
 % debug_draw_vectors(preprocessed_data, classes)
 
-save_data(preprocessed_data, classes', "data/preprocessed", "test1.mat")
+classes(classes == 0) = 10;
+
+prompt = 'Give a name for this preprocessed data (press enter to discard): ';
+str = input(prompt,'s');
+if ~isempty(str)
+    save_data(preprocessed_data, classes', "data/preprocessed", str+".mat")
+end
