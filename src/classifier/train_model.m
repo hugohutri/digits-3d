@@ -13,6 +13,10 @@ IMAGE_DIMENSIONS = sqrt(PIXEL_AMOUNT);
 % the future.
 
 
+% FOR REPRODUCTION WATCH OUT!
+rng(123)
+
+
 
 sample_of_each = 80; % 400
 data_size = sample_of_each * 10;
@@ -50,7 +54,7 @@ end
 %% The real training part begings here
 
 
-number_of_train = 800; % 2000;
+number_of_train = 600; % 2000;
 
 
 % Suffling the data to train and test
@@ -74,6 +78,8 @@ test_class = sample_class(:, ~suffle);
 % imshow(example)
 
 
+max_iter = 100;
+
 % input_size = 625;
 input_size = PIXEL_AMOUNT;
 
@@ -86,148 +92,240 @@ output_size = 10;
 base_NN = create_NN(input_size, hidden_size, hidden_layers, output_size);
 
 
-max_iter = 600;
-
-child_count = 110;
-num_top_child = 50; %3;
-top_children = Child.empty(num_top_child, 0);
-
-% Overall best child ever created
-best_child = NaN;
-best_child_score = number_of_train;
-
-% Initial value, will change during runtime
-learn_rate = 100;
-min_learn_rate = 0.001;
-
-% List for monitoring performance etc
-best_epoch_accuracies = [];
-epoch_durations = [];
-
-for epoch = 1:max_iter
-    fprintf("Starting epoch\n")
-
-    % Start timer
-    t_start = tic;
-
-    child_list = NaN;
-    child_scores = zeros(1, child_count);
-
-    if epoch == 1
-        % fprintf("Creating children\n")
-        % Create_children(parent, child_count, learn_rate, limits, use_gauss)
-        child_list = create_children(base_NN, child_count, learn_rate, [-1e1, 1e1], false);
-        % fprintf("Children created\n")
-
-    else
-        child_list = create_all_children(top_children, best_child, learn_rate, base_NN);
-        % fprintf("Creating children\n")
-        % % Create_children(parent, child_count, learn_rate, limits, use_gauss)
-        % % TODO: ratios are hard coded
-        
-        % child_list_1 = create_children(top_children(1), 50, learn_rate);
-        % child_list_2 = create_children(top_children(2), 20, learn_rate);
-        % child_list_3 = create_children(top_children(3), 10, learn_rate);
-        % % Best child has 10 children
-        % child_list_4 = create_children(best_child, 10, learn_rate * 0.1);
-        % % 20 purely random children
-        % child_list_5 = create_children(base_NN, 20, 100, [-1e1, 1e1], false);
-
-        % child_list = [child_list_1, child_list_2, child_list_3, child_list_4, child_list_5];
-        % fprintf("Children created\n")
-    end
+N = 8;
+learning_multipliers = linspace(1e-6, 1e-1, N);
+M = 4;
 
 
+accuracies = zeros(N, M);
 
-    % Evaluate each child
-    % fprintf("Evaluating each children\n")
-    parfor n = 1:child_count
 
-        % fprintf("Evaluating child %d\n", n)
-        child = child_list(n);
-        error_sum = 0;
+figure
+hax_main = axes;
 
-        for m = 1:number_of_train
+for trial = 1:N
+    
+    learning_multiplier = learning_multipliers(trial);
+    
+    best_of_trial = NaN;
+    best_of_trial_score = 999;
+    
+    
+    for iter = 1:M
+    
+        [best_child, best_child_score] = train_simple_model(train_data, train_class, base_NN, max_iter, learning_multiplier, false);
 
-            % result = Evaluate_NN(child, input)
-            result = evaluate_NN(child, train_data(:, m));
-
-            [M,I] = max(result);
-
-            % If it's not correct
-            if I ~= train_class(m)
-               error_sum = error_sum + 1;
-            % else
-
-                % imshow(reshape(train_data(:, m), [16 16]))
-                % fprintf("Is number: %d\n", train_class(m))
-                % drawnow
-            end
+        if (best_child_score < best_of_trial_score)
+            best_of_trial = best_child;
         end
-
-        error_sum;
-        child_scores(n) = error_sum;
+        
+        best_accuracy = (1 - (best_child_score ./ number_of_train)) * 100;
+        
+        accuracies(trial, iter) = best_accuracy;
+        
+        fprintf("Trial %d, iteration %d: accuracy %0.2f%%\n", trial, iter, best_accuracy)
     end
-    % fprintf("Children evaluated\n")
-
-
-
-
-    % Rank the children
-    [B,I] = sort(child_scores);
-
-    top_children = child_list( I(1:num_top_child) );
-
-    learn_rate = min_learn_rate * B(1) * 2; % 0.1;
-
-    if B(1) < best_child_score
-
-        best_child_score = B(1);
-        best_child = child_list( I(1) );
-    end
-
-    % Stopping the timer
-    t_delta = toc(t_start);
-
-    if epoch == 1
-
-        full_duration = seconds(t_delta * max_iter);
-        full_duration.Format = 'hh:mm';
-
-        fprintf("Training has been started with %d iterations\n", max_iter);
-        fprintf("Estimated complete duration %s hh:mm\n\n", full_duration);
-    end
-
-    fprintf('[%s]\n', datestr(now,'hh:MM:ss'))
-    fprintf("Epoch: %d/%d, with learn rate: %0.3f\n", epoch, max_iter, learn_rate)
-    top_accuracies = (1 - (B(1:3) ./ number_of_train)) * 100;
-    fprintf("Top accuracies: %0.1f%%, %0.1f%%, %0.1f%%\n",top_accuracies)
-    fprintf("Time taken: %0.3fs\n", t_delta)
-    epoch_durations = [epoch_durations t_delta];
-    average_epoch_duration = mean(epoch_durations);
-    fprintf("Average epoch duration: %0.3fs\n", average_epoch_duration)
-
-    fprintf("\n")
-
-    save("best_child.mat", "best_child")
-
-    % PLOTTING
-
-    best_epoch_accuracies = [best_epoch_accuracies, top_accuracies(1)];
+    
+    
+    means = mean(accuracies, 2);
+    mins = min(accuracies, [], 2);
+    maxs = max(accuracies, [], 2);
+    
+    dif_low = abs(mins(1:trial) - means(1:trial));
+    dif_high = maxs(1:trial) - means(1:trial);
+    
+    
+    bar(hax_main, learning_multipliers(1:trial), means(1:trial))
+    
     hold on;
     
-    % Plot accuracy
-    subplot(2,1,1);
-    plot(1:epoch, best_epoch_accuracies, "b");
-    title("Accuracy");
-    ylabel("%");
+    er = errorbar(learning_multipliers(1:trial), means(1:trial) , dif_low, dif_high);    
+    er.Color = [0 0 0];                            
+    er.LineStyle = 'none';
     
-    % Plot time taken per epoch
-    subplot(2,1,2);
-    plot(1:epoch, epoch_durations, "b");
-    title("Epoch duration");
-    ylabel("seconds");
-
-    drawnow;
+    hold off;
+    drawnow
 end
 
+
+
+
+
+
+
+
+
+function [best_child, best_child_score] = train_simple_model(train_data, train_class, base_NN, max_iter, learning_multiplier, verbal)
+
+
+
+    arguments
+       % 
+       train_data (:,:) double
+       % 
+       train_class (:,:) double
+       % 
+       base_NN Child = NaN
+       % 
+       max_iter uint16 = 600
+       %
+       learning_multiplier = 0.001;
+       % Plotting on / off
+       verbal logical = true
+    end
+
+    child_count = 110;
+    num_top_child = 50; %3;
+    top_children = Child.empty(num_top_child, 0);
+    
+    number_of_train = length(train_class);
+
+    % Overall best child ever created
+    best_child = NaN;
+    best_child_score = number_of_train;
+
+    % Initial value, will change during runtime
+    learn_rate = 0;
+    % learning_multiplier = 0.001;
+
+    % List for monitoring performance etc
+    best_epoch_accuracies = [];
+    epoch_durations = [];
+
+    for epoch = 1:max_iter
+        if (verbal)
+            fprintf("Starting epoch\n")
+        end
+
+        % Start timer
+        t_start = tic;
+
+        child_list = NaN;
+        child_scores = zeros(1, child_count);
+
+        if epoch == 1
+            % fprintf("Creating children\n")
+            % Create_children(parent, child_count, learn_rate, limits, use_gauss)
+            child_list = create_children(base_NN, child_count, learn_rate, [-1e1, 1e1], false);
+            % fprintf("Children created\n")
+
+        else
+            child_list = create_all_children(top_children, best_child, learn_rate, base_NN);
+            % fprintf("Creating children\n")
+            % % Create_children(parent, child_count, learn_rate, limits, use_gauss)
+            % % TODO: ratios are hard coded
+
+            % child_list_1 = create_children(top_children(1), 50, learn_rate);
+            % child_list_2 = create_children(top_children(2), 20, learn_rate);
+            % child_list_3 = create_children(top_children(3), 10, learn_rate);
+            % % Best child has 10 children
+            % child_list_4 = create_children(best_child, 10, learn_rate * 0.1);
+            % % 20 purely random children
+            % child_list_5 = create_children(base_NN, 20, 100, [-1e1, 1e1], false);
+
+            % child_list = [child_list_1, child_list_2, child_list_3, child_list_4, child_list_5];
+            % fprintf("Children created\n")
+        end
+
+
+
+        % Evaluate each child
+        % fprintf("Evaluating each children\n")
+        parfor n = 1:child_count
+
+            % fprintf("Evaluating child %d\n", n)
+            child = child_list(n);
+            error_sum = 0;
+
+            for m = 1:number_of_train
+
+                % result = Evaluate_NN(child, input)
+                result = evaluate_NN(child, train_data(:, m));
+
+                [M,I] = max(result);
+
+                % If it's not correct
+                if I ~= train_class(m)
+                   error_sum = error_sum + 1;
+                % else
+
+                    % imshow(reshape(train_data(:, m), [16 16]))
+                    % fprintf("Is number: %d\n", train_class(m))
+                    % drawnow
+                end
+            end
+
+            error_sum;
+            child_scores(n) = error_sum;
+        end
+        % fprintf("Children evaluated\n")
+
+
+
+
+        % Rank the children
+        [B,I] = sort(child_scores);
+
+        top_children = child_list( I(1:num_top_child) );
+        
+        % Learn rate is = learning_multiplier * percentage of errors
+        % Makes this more scalable
+        learn_rate = learning_multiplier * (B(1) / number_of_train);
+
+        if B(1) < best_child_score
+
+            best_child_score = B(1);
+            best_child = child_list( I(1) );
+        end
+
+        % Stopping the timer
+        t_delta = toc(t_start);
+
+        if (epoch == 1 && verbal)
+
+            full_duration = seconds(t_delta * max_iter);
+            full_duration.Format = 'hh:mm';
+
+            fprintf("\nTraining has been started with %d iterations\n", max_iter);
+            fprintf("Estimated complete duration %s hh:mm\n\n", full_duration);
+        end
+
+        
+           
+        if (verbal)
+            
+            fprintf('[%s]\n', datestr(now,'hh:MM:ss'))
+            fprintf("Epoch: %d/%d, with learn rate: %0.3f\n", epoch, max_iter, learn_rate)
+            top_accuracies = (1 - (B(1:3) ./ number_of_train)) * 100;
+            fprintf("Top accuracies: %0.1f%%, %0.1f%%, %0.1f%%\n",top_accuracies)
+            fprintf("Time taken: %0.3fs\n", t_delta)
+            epoch_durations = [epoch_durations t_delta];
+            average_epoch_duration = mean(epoch_durations);
+            fprintf("Average epoch duration: %0.3fs\n", average_epoch_duration)
+
+            fprintf("\n")
+
+            save("best_child.mat", "best_child")
+
+            % PLOTTING
+            
+            
+            best_epoch_accuracies = [best_epoch_accuracies, top_accuracies(1)];
+            hold on;
+
+            % Plot accuracy
+            subplot(2,1,1);
+            plot(1:epoch, best_epoch_accuracies, "b");
+            title("Accuracy");
+            ylabel("%");
+
+            % Plot time taken per epoch
+            subplot(2,1,2);
+            plot(1:epoch, epoch_durations, "b");
+            title("Epoch duration");
+            ylabel("seconds");
+
+            drawnow;
+        end
+    end
+end

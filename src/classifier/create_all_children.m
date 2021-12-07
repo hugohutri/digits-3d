@@ -1,5 +1,5 @@
 function children = create_all_children(top_children, best_child, learn_rate, base_NN)
-    fprintf("Creating children\n")
+    % fprintf("Creating children\n")
     % Create_children(parent, child_count, learn_rate, limits, use_gauss)
 
     children = [];
@@ -22,5 +22,5 @@ function children = create_all_children(top_children, best_child, learn_rate, ba
     % Add all children together
     % -> 100 + 10 = 110
     children = [children child_list_random];
-    fprintf("Children created\n")
+    % fprintf("Children created\n")
 end
