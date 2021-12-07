@@ -1,5 +1,6 @@
 clc; clearvars; close all;
 
+
 % Test images found online
 % load('usps_all');
 
@@ -77,7 +78,7 @@ test_class = sample_class(:, ~suffle);
 % input_size = 625;
 input_size = PIXEL_AMOUNT;
 
-hidden_size = 160; % 256;
+hidden_size = 220; % 256;
 hidden_layers = 3; % 6;
 
 output_size = 10;
@@ -89,7 +90,7 @@ base_NN = create_NN(input_size, hidden_size, hidden_layers, output_size);
 max_iter = 600;
 
 child_count = 110;
-num_top_child = 50; %3;
+num_top_child = child_count; % 50; %3;
 top_children = Child.empty(num_top_child, 0);
 
 % Overall best child ever created
@@ -103,6 +104,7 @@ min_learn_rate = 0.001;
 % List for monitoring performance etc
 best_epoch_accuracies = [];
 epoch_durations = [];
+
 
 for epoch = 1:max_iter
     fprintf("Starting epoch\n")
@@ -141,6 +143,8 @@ for epoch = 1:max_iter
 
     % Evaluate each child
     % fprintf("Evaluating each children\n")
+    child_list_constant = parallel.pool.Constant(child_list);
+    train_data_constant = parallel.pool.Constant(train_data);
     parfor n = 1:child_count
 
         % fprintf("Evaluating child %d\n", n)
@@ -178,7 +182,7 @@ for epoch = 1:max_iter
 
     top_children = child_list( I(1:num_top_child) );
 
-    learn_rate = min_learn_rate * B(1) * 2; % 0.1;
+    learn_rate = min_learn_rate * B(1) * 1; % 0.1;
 
     if B(1) < best_child_score
 
