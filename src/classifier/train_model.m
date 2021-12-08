@@ -102,6 +102,8 @@ learn_rate = 100;
 min_learn_rate = 0.001;
 
 % List for monitoring performance etc
+average_accuracies = [];
+average_top10_accuracies = [];
 best_epoch_accuracies = [];
 epoch_durations = [];
 
@@ -121,7 +123,7 @@ for epoch = 1:max_iter
 
     % Evaluate each child
     % fprintf("Evaluating each children\n")
-    child_list_constant = parallel.pool.Constant(child_list);
+    % child_list_constant = parallel.pool.Constant(child_list);
     parfor n = 1:child_count
         child_scores(n) = 0;
 
@@ -172,8 +174,10 @@ for epoch = 1:max_iter
 
     fprintf('[%s]\n', datestr(now,'hh:MM:ss'))
     fprintf("Epoch: %d/%d, with learn rate: %0.3f\n", epoch, max_iter, learn_rate)
-    top_accuracies = (1 - (B(1:3) ./ number_of_train)) * 100;
-    fprintf("Top accuracies: %0.1f%%, %0.1f%%, %0.1f%%\n",top_accuracies)
+    accuracies = (1 - (B ./ number_of_train)) * 100;
+    average_accuracy = mean(accuracies);
+    fprintf("Top accuracies: %0.1f%%, %0.1f%%, %0.1f%%\n",accuracies(1:3))
+    fprintf("Average accuracy: %0.1f%% \n",average_accuracy)
     fprintf("Time taken: %0.3fs\n", t_delta)
     epoch_durations = [epoch_durations t_delta];
     average_epoch_duration = mean(epoch_durations);
@@ -185,12 +189,17 @@ for epoch = 1:max_iter
     save("best_child.mat", "best_child")
     % PLOTTING
 
-    best_epoch_accuracies = [best_epoch_accuracies, top_accuracies(1)];
+    best_epoch_accuracies = [best_epoch_accuracies, accuracies(1)];
+    average_accuracies = [average_accuracies average_accuracy];
+    average_top10_accuracies = [average_top10_accuracies mean(accuracies(1:10))];
     hold on;
     
     % Plot accuracy
     subplot(2,1,1);
-    plot(1:epoch, best_epoch_accuracies, "b");
+    plot(1:epoch, best_epoch_accuracies, "b"); hold on;
+    plot(1:epoch, average_top10_accuracies, "m"); hold on;
+    plot(1:epoch, average_accuracies, "r"); hold on;
+    legend("Best accuracy", "Average top 10 accuracy", "Average accuracy", "Location", "southeast")
     title("Accuracy");
     ylabel("%");
     
