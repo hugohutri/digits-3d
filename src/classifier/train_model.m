@@ -89,7 +89,7 @@ base_NN = create_NN(input_size, hidden_size, hidden_layers, output_size);
 
 max_iter = 600;
 
-child_count = 110;
+child_count = 200;
 num_top_child = child_count; % 50; %3;
 top_children = Child.empty(num_top_child, 0);
 
@@ -100,7 +100,7 @@ best_child_score = number_of_train;
 % Initial value, will change during runtime
 learn_rate = 100;
 % Hat constant
-learning_multiplier = 0.04;
+learning_multiplier = 1;
 
 % List for monitoring performance etc
 average_accuracies = [];
@@ -115,7 +115,7 @@ train_class_constant = parallel.pool.Constant(train_class);
 child_scores = zeros(1, child_count);
 
 % First epoch child list
-child_list = create_children(base_NN, child_count, learn_rate, [-1e1, 1e1], false);
+child_list = create_children(base_NN, child_count, learn_rate, [-1e1, 1e1], true);
 for epoch = 1:max_iter
     fprintf("Starting epoch\n")
 
@@ -159,6 +159,7 @@ for epoch = 1:max_iter
     end
     
     % Next epoch child list.
+    fprintf("Length of child list: %d \n", length(child_list));
     child_list = create_all_children(top_children, learn_rate, base_NN);
 
     % Stopping the timer
