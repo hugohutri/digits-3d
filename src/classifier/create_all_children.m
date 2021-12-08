@@ -1,4 +1,4 @@
-function children = create_all_children(top_children, best_child, learn_rate, base_NN)
+function children = create_all_children(top_children, learn_rate, base_NN)
     % fprintf("Creating children\n")
     % Create_children(parent, child_count, learn_rate, limits, use_gauss)
 
@@ -36,12 +36,12 @@ function children = create_all_children(top_children, best_child, learn_rate, ba
     % child_list_best = create_children(best_child, 5, learn_rate * 0.1);
 
     % 10 purely random children
-    child_list_random = create_children(base_NN, 10, 100, [-1e1, 1e1], false);
+    child_list_random = create_children(base_NN, 9, 100, [-1e1, 1e1], false);
 
     % children = [children child_list_best child_list_random];
 
     % Add all children together
     % -> 100 + 10 = 110
-    children = [children child_list_random];
+    children = [children child_list_random top_children(1)];
     % fprintf("Children created\n")
 end

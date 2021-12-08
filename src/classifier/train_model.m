@@ -122,7 +122,7 @@ for epoch = 1:max_iter
         % fprintf("Children created\n")
 
     else
-        child_list = create_all_children(top_children, best_child, learn_rate, base_NN);
+        child_list = create_all_children(top_children, learn_rate, base_NN);
         % fprintf("Creating children\n")
         % % Create_children(parent, child_count, learn_rate, limits, use_gauss)
         % % TODO: ratios are hard coded
@@ -213,8 +213,8 @@ for epoch = 1:max_iter
 
     fprintf("\n")
 
+    
     save("best_child.mat", "best_child")
-
     % PLOTTING
 
     best_epoch_accuracies = [best_epoch_accuracies, top_accuracies(1)];
