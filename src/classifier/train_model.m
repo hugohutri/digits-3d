@@ -99,7 +99,8 @@ best_child_score = number_of_train;
 
 % Initial value, will change during runtime
 learn_rate = 100;
-min_learn_rate = 0.001;
+% Hat constant
+learning_multiplier = 0.04;
 
 % List for monitoring performance etc
 average_accuracies = [];
@@ -149,7 +150,7 @@ for epoch = 1:max_iter
 
     top_children = child_list( I(1:num_top_child) );
 
-    learn_rate = min_learn_rate * B(1) * 1; % 0.1;
+    learn_rate = learning_multiplier * (B(1) ./ number_of_train);
 
     if B(1) < best_child_score
 
