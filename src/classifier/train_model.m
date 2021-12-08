@@ -106,71 +106,36 @@ best_epoch_accuracies = [];
 epoch_durations = [];
 
 
+% Initialize data and variables that are needed for the execution.
+train_data_constant = parallel.pool.Constant(train_data);
+train_class_constant = parallel.pool.Constant(train_class);
+child_scores = zeros(1, child_count);
+
+% First epoch child list
+child_list = create_children(base_NN, child_count, learn_rate, [-1e1, 1e1], false);
 for epoch = 1:max_iter
     fprintf("Starting epoch\n")
 
     % Start timer
     t_start = tic;
 
-    child_list = NaN;
-    child_scores = zeros(1, child_count);
-
-    if epoch == 1
-        % fprintf("Creating children\n")
-        % Create_children(parent, child_count, learn_rate, limits, use_gauss)
-        child_list = create_children(base_NN, child_count, learn_rate, [-1e1, 1e1], false);
-        % fprintf("Children created\n")
-
-    else
-        child_list = create_all_children(top_children, learn_rate, base_NN);
-        % fprintf("Creating children\n")
-        % % Create_children(parent, child_count, learn_rate, limits, use_gauss)
-        % % TODO: ratios are hard coded
-        
-        % child_list_1 = create_children(top_children(1), 50, learn_rate);
-        % child_list_2 = create_children(top_children(2), 20, learn_rate);
-        % child_list_3 = create_children(top_children(3), 10, learn_rate);
-        % % Best child has 10 children
-        % child_list_4 = create_children(best_child, 10, learn_rate * 0.1);
-        % % 20 purely random children
-        % child_list_5 = create_children(base_NN, 20, 100, [-1e1, 1e1], false);
-
-        % child_list = [child_list_1, child_list_2, child_list_3, child_list_4, child_list_5];
-        % fprintf("Children created\n")
-    end
-
-
-
     % Evaluate each child
     % fprintf("Evaluating each children\n")
     child_list_constant = parallel.pool.Constant(child_list);
-    train_data_constant = parallel.pool.Constant(train_data);
     parfor n = 1:child_count
-
-        % fprintf("Evaluating child %d\n", n)
-        child = child_list(n);
-        error_sum = 0;
+        child_scores(n) = 0;
 
         for m = 1:number_of_train
 
             % result = Evaluate_NN(child, input)
-            result = evaluate_NN(child, train_data(:, m));
+            result = evaluate_NN(child_list(n), train_data_constant.Value(:, m), ...
+                                 hidden_layers);
 
-            [M,I] = max(result);
+            [~,I] = max(result);
 
             % If it's not correct
-            if I ~= train_class(m)
-               error_sum = error_sum + 1;
-            % else
-
-                % imshow(reshape(train_data(:, m), [16 16]))
-                % fprintf("Is number: %d\n", train_class(m))
-                % drawnow
-            end
+            child_scores(n) = child_scores(n) + (I ~= train_class_constant.Value(m));
         end
-
-        error_sum;
-        child_scores(n) = error_sum;
     end
     % fprintf("Children evaluated\n")
 
@@ -189,6 +154,9 @@ for epoch = 1:max_iter
         best_child_score = B(1);
         best_child = child_list( I(1) );
     end
+    
+    % Next epoch child list.
+    child_list = create_all_children(top_children, learn_rate, base_NN);
 
     % Stopping the timer
     t_delta = toc(t_start);
