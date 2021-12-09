@@ -1,4 +1,4 @@
-function processed_data = preprocess(raw_data, justified_size, image_dimensions)
+function [processed_data, projection_matrix] = preprocess(raw_data, justified_size, image_dimensions)
     % Remove completedly zero entries.
     zero_cleaned_data = preprocess_clean_zeros(raw_data);
 

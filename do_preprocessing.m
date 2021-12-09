@@ -28,8 +28,8 @@ end
 % [data, classes] = debug_filter_data(data, classes, 9);
 
 % Preprocess.
-DIMENSIONS = 16; % px
-preprocessed_data = preprocess(data, 1000, DIMENSIONS);
+DIMENSIONS = 32; % px
+[preprocessed_data, projection_matrix] = preprocess(data, 2000, DIMENSIONS);
 
 % Draw output as pixels.
 debug_draw_pixels(preprocessed_data, classes)
@@ -39,8 +39,5 @@ debug_draw_pixels(preprocessed_data, classes)
 
 classes(classes == 0) = 10;
 
-prompt = 'Give a name for this preprocessed data (press enter to discard): ';
-str = input(prompt,'s');
-if ~isempty(str)
-    save_data(preprocessed_data, classes', "data/preprocessed", str+".mat")
-end
+save_data(preprocessed_data, classes', "data/preprocessed", "preprocessed_training_data.mat")
+save("data/model/projection_matrix.mat", "projection_matrix")
