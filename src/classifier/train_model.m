@@ -21,6 +21,11 @@ data_size = sample_of_each * 10;
 sample_data  = [];
 sample_class = [];
 
+% Randomize the order of the data
+random_order = randperm(length(data));
+data = data(:,random_order);
+classes = classes(random_order);
+
 for cls = 1:10
 
     % data_group = [];
@@ -78,7 +83,7 @@ test_class = sample_class(:, ~suffle);
 % input_size = 625;
 input_size = PIXEL_AMOUNT;
 
-hidden_size = 220; % 256;
+hidden_size = 220; %220; % 256;
 hidden_layers = 3; % 6;
 
 output_size = 10;
@@ -89,7 +94,7 @@ base_NN = create_NN(input_size, hidden_size, hidden_layers, output_size);
 
 max_iter = 600;
 
-child_count = 200;
+child_count = 120;
 num_top_child = child_count; % 50; %3;
 top_children = Child.empty(num_top_child, 0);
 
@@ -119,6 +124,8 @@ child_list = create_children(base_NN, child_count, learn_rate, [-1e1, 1e1], true
 for epoch = 1:max_iter
     fprintf("Starting epoch\n")
 
+    class_scores = zeros(child_count, number_of_train);
+
     % Start timer
     t_start = tic;
 
@@ -131,13 +138,19 @@ for epoch = 1:max_iter
         for m = 1:number_of_train
 
             % result = Evaluate_NN(child, input)
-            result = evaluate_NN(child_list(n), train_data_constant.Value(:, m), ...
-                                 hidden_layers);
+            result = evaluate_NN(child_list(n), ...
+                        train_data(:, m), ...      % train_data_constant.Value(:, m),      
+                        hidden_layers);
 
             [~,I] = max(result);
 
             % If it's not correct
-            child_scores(n) = child_scores(n) + (I ~= train_class_constant.Value(m));
+            % child_scores(n) = child_scores(n) + (I ~= train_class_constant.Value(m)); % Select one of these lines
+            C = train_class(m);
+            child_scores(n) = child_scores(n) + (I ~= C);
+            if (I == C)
+                class_scores(n, m) = C;
+            end 
         end
     end
     % fprintf("Children evaluated\n")
@@ -165,6 +178,8 @@ for epoch = 1:max_iter
     % Stopping the timer
     t_delta = toc(t_start);
 
+    save("best_child.mat", "best_child")
+
     if epoch == 1
 
         full_duration = seconds(t_delta * max_iter);
@@ -187,8 +202,16 @@ for epoch = 1:max_iter
 
     fprintf("\n")
 
+    for i = 1:10
+        correcly_quessed_amount = nnz(class_scores == i);
+        max_amount = nnz(train_class == i);
+        percentage = correcly_quessed_amount / max_amount;
+        fprintf("Correct quesses for class %d: %2.1f%%\n", mod(i,10), percentage);
+    end
+
+
+    fprintf("\n")
     
-    save("best_child.mat", "best_child")
     % PLOTTING
 
     best_epoch_accuracies = [best_epoch_accuracies, accuracies(1)];
