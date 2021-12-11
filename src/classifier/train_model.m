@@ -22,20 +22,6 @@ sample_data  = [];
 sample_class = [];
 
 for cls = 1:10
-
-    % data_group = [];
-    % class_group = [];
-    % for n = 1:sample_of_each
-    %     data_group = [data_group, data(:, n)];
-    %     class_group = [class_group, classes(n)];
-    % end
-
-        
-
-    % sample_data = [sample_data, data_group];
-
-    % sample_class = [sample_class, class_group];
-    % sample_class = [sample_class, ones(1, sample_of_each) * cls];
     data_group = data(:,classes == cls);
     sample_data = [sample_data data_group(:,1:sample_of_each)];
     sample_class = [sample_class ones(1, sample_of_each) * cls];
@@ -51,11 +37,12 @@ end
 %% The real training part begings here
 
 
-number_of_train = 800; % 2000;
+number_of_train = 700;
+number_of_test  = data_size - number_of_train; % 100 test when 700 train
 
 
 % Suffling the data to train and test
-r = [ones(1, number_of_train), zeros(1, data_size - number_of_train)];
+r = [ones(1, number_of_train), zeros(1, number_of_test)];
 
 suffle = logical(   r(randperm(length(r)))   );
 
@@ -87,129 +74,53 @@ output_size = 10;
 base_NN = create_NN(input_size, hidden_size, hidden_layers, output_size);
 
 
-max_iter = 600;
-
-child_count = 110;
-num_top_child = child_count; % 50; %3;
-top_children = Child.empty(num_top_child, 0);
-
-% Overall best child ever created
-best_child = NaN;
-best_child_score = number_of_train;
-
-% Initial value, will change during runtime
-learn_rate = 100;
-% Hat constant
-learning_multiplier = 0.04;
-
-% List for monitoring performance etc
-average_accuracies = [];
-average_top10_accuracies = [];
-best_epoch_accuracies = [];
-epoch_durations = [];
+max_iter = 6000;
 
 
-% Initialize data and variables that are needed for the execution.
-train_data_constant = parallel.pool.Constant(train_data);
-train_class_constant = parallel.pool.Constant(train_class);
-child_scores = zeros(1, child_count);
 
-% First epoch child list
-child_list = create_children(base_NN, child_count, learn_rate, [-1e1, 1e1], false);
-for epoch = 1:max_iter
-    fprintf("Starting epoch\n")
 
-    % Start timer
-    t_start = tic;
+trial_count = 1;
+iter_count  = 1;
 
-    % Evaluate each child
-    % fprintf("Evaluating each children\n")
-    % child_list_constant = parallel.pool.Constant(child_list);
-    parfor n = 1:child_count
-        child_scores(n) = 0;
 
-        for m = 1:number_of_train
+% For each trial, where each trial might be one number to train on (Roni)
+for trial = 1:trial_count
 
-            % result = Evaluate_NN(child, input)
-            result = evaluate_NN(child_list(n), train_data_constant.Value(:, m), ...
-                                 hidden_layers);
+    % Where each iteration might be on attempt at getting good accuracy %
+    for iter = 1:iter_count
 
-            [~,I] = max(result);
+        % top_children = simple_model_train(base_NN, train_data, train_class, epoch_count, target_accuracy, verbal)
+        top_children = simple_model_train(base_NN, train_data, train_class, 10);
+        
+        child_count = length(top_children);
+        
+        % Evaluate the children with test data
+        % -> verifying the learning / Validation
+        child_scores = zeros(1, child_count);
 
-            % If it's not correct
-            child_scores(n) = child_scores(n) + (I ~= train_class_constant.Value(m));
+        child_count = length(top_children);
+        for c = 1:child_count
+            
+            % Test each test data
+            for m = 1:number_of_test
+
+                result = evaluate_NN(top_children(c), test_data(:, m), ...
+                                        hidden_layers);
+                
+                [~,I] = max(result);
+
+                % If it's not correct
+                child_scores(c) = child_scores(c) + (I ~= train_class(m));
+            end
         end
+
+        % Rank the children
+        [B,I] = sort(child_scores);
+        validation_accuracies = (1 - (B ./ number_of_test)) * 100;
+
+        fprintf("Validation accuracy of the best child was %0.3f%%\n", validation_accuracies(1))
+
+        % TODO: Plot the validation accuracies or something cool
     end
-    % fprintf("Children evaluated\n")
-
-
-
-
-    % Rank the children
-    [B,I] = sort(child_scores);
-
-    top_children = child_list( I(1:num_top_child) );
-
-    learn_rate = learning_multiplier * (B(1) ./ number_of_train);
-
-    if B(1) < best_child_score
-
-        best_child_score = B(1);
-        best_child = child_list( I(1) );
-    end
-    
-    % Next epoch child list.
-    child_list = create_all_children(top_children, learn_rate, base_NN);
-
-    % Stopping the timer
-    t_delta = toc(t_start);
-
-    if epoch == 1
-
-        full_duration = seconds(t_delta * max_iter);
-        full_duration.Format = 'hh:mm';
-
-        fprintf("Training has been started with %d iterations\n", max_iter);
-        fprintf("Estimated complete duration %s hh:mm\n\n", full_duration);
-    end
-
-    fprintf('[%s]\n', datestr(now,'hh:MM:ss'))
-    fprintf("Epoch: %d/%d, with learn rate: %0.3f\n", epoch, max_iter, learn_rate)
-    accuracies = (1 - (B ./ number_of_train)) * 100;
-    average_accuracy = mean(accuracies);
-    fprintf("Top accuracies: %0.1f%%, %0.1f%%, %0.1f%%\n",accuracies(1:3))
-    fprintf("Average accuracy: %0.1f%% \n",average_accuracy)
-    fprintf("Time taken: %0.3fs\n", t_delta)
-    epoch_durations = [epoch_durations t_delta];
-    average_epoch_duration = mean(epoch_durations);
-    fprintf("Average epoch duration: %0.3fs\n", average_epoch_duration)
-
-    fprintf("\n")
-
-    
-    save("best_child.mat", "best_child")
-    % PLOTTING
-
-    best_epoch_accuracies = [best_epoch_accuracies, accuracies(1)];
-    average_accuracies = [average_accuracies average_accuracy];
-    average_top10_accuracies = [average_top10_accuracies mean(accuracies(1:10))];
-    hold on;
-    
-    % Plot accuracy
-    subplot(2,1,1);
-    plot(1:epoch, best_epoch_accuracies, "b"); hold on;
-    plot(1:epoch, average_top10_accuracies, "m"); hold on;
-    plot(1:epoch, average_accuracies, "r"); hold on;
-    legend("Best accuracy", "Average top 10 accuracy", "Average accuracy", "Location", "southeast")
-    title("Accuracy");
-    ylabel("%");
-    
-    % Plot time taken per epoch
-    subplot(2,1,2);
-    plot(1:epoch, epoch_durations, "b");
-    title("Epoch duration");
-    ylabel("seconds");
-
-    drawnow;
 end
 
