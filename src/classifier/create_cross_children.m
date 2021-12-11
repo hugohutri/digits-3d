@@ -3,8 +3,11 @@ function children = create_cross_children(top_children, base_NN, mutation_rate, 
     % Create_children(parent, child_count, learn_rate, limits, use_gauss)
 
     children = [];
-
-    n = 12;
+    
+    % The smaller the number the more likely the top ones are to be bred
+    % exclusively. On contrary the bigger the number the more it allows the
+    % outliers to have a chance of breeding
+    n = 20;
     
     
     pair_count = 33;
