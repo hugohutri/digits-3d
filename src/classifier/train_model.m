@@ -96,7 +96,7 @@ for trial = 1:trial_count
         
         % Evaluate the children with test data
         % -> verifying the learning / Validation
-        child_scores = zeros(1, child_count);
+        child_errors = zeros(1, child_count);
 
         child_count = length(top_children);
         for c = 1:child_count
@@ -110,12 +110,12 @@ for trial = 1:trial_count
                 [~,I] = max(result);
 
                 % If it's not correct
-                child_scores(c) = child_scores(c) + (I ~= train_class(m));
+                child_errors(c) = child_errors(c) + (I ~= train_class(m));
             end
         end
 
         % Rank the children
-        [B,I] = sort(child_scores);
+        [B,I] = sort(child_errors);
         validation_accuracies = (1 - (B ./ number_of_test)) * 100;
 
         fprintf("Validation accuracy of the best child was %0.3f%%\n", validation_accuracies(1))

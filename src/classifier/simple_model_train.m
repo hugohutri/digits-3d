@@ -26,7 +26,7 @@ function top_children = simple_model_train(base_NN, train_data, train_class, epo
 
     % Overall best child ever created
     best_child = NaN;
-    best_child_score = epoch_count;
+    best_child_error = epoch_count;
 
     % List for monitoring performance etc
     average_accuracies = [];
@@ -42,7 +42,7 @@ function top_children = simple_model_train(base_NN, train_data, train_class, epo
     % Initialize data and variables that are needed for the execution.
     train_data_constant = parallel.pool.Constant(train_data);
     train_class_constant = parallel.pool.Constant(train_class);
-    child_scores = zeros(1, child_count);
+    child_errors = zeros(1, child_count);
 
     % First epoch child list
     child_list = create_children(base_NN, child_count, 0, [-1e1, 1e1], false);
@@ -58,7 +58,7 @@ function top_children = simple_model_train(base_NN, train_data, train_class, epo
         % fprintf("Evaluating each children\n")
         child_list_constant = parallel.pool.Constant(child_list);
         parfor n = 1:child_count
-            child_scores(n) = 0;
+            child_errors(n) = 0;
 
             for m = 1:number_of_train
 
@@ -69,7 +69,7 @@ function top_children = simple_model_train(base_NN, train_data, train_class, epo
                 [~,I] = max(result);
 
                 % If it's not correct
-                child_scores(n) = child_scores(n) + (I ~= train_class_constant.Value(m));
+                child_errors(n) = child_errors(n) + (I ~= train_class_constant.Value(m));
             end
         end
         % fprintf("Children evaluated\n")
@@ -78,13 +78,13 @@ function top_children = simple_model_train(base_NN, train_data, train_class, epo
 
 
         % Rank the children
-        [B,I] = sort(child_scores);
+        [B,I] = sort(child_errors);
 
         top_children = child_list( I(1:num_top_child) );
 
-        if B(1) < best_child_score
+        if B(1) < best_child_error
 
-            best_child_score = B(1);
+            best_child_error = B(1);
             best_child = child_list( I(1) );
         end
         
