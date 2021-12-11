@@ -11,7 +11,7 @@ function children = create_cross_children(top_children, base_NN, mutation_rate, 
     % Another way of seeing this is: the smaller this number, the less
     % there will be difference between the average accuracy and top
     % accuracy
-    n = 20;
+    n = 24;
     
     
     pair_count = 33;
@@ -31,6 +31,8 @@ function children = create_cross_children(top_children, base_NN, mutation_rate, 
     same = s1 == s2;
 
     s2(same == 1) = s2(same == 1) + 1;
+    
+    s2(s2 > 110) = 110;
     
     
     for p = 1:pair_count
