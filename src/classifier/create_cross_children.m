@@ -32,6 +32,8 @@ function children = create_cross_children(top_children, base_NN, mutation_rate, 
 
     s2(same == 1) = s2(same == 1) + 1;
     
+    s2(s2 > 110) = 110;
+    
     
     for p = 1:pair_count
         
