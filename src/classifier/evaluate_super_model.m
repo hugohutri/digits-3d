@@ -1,7 +1,5 @@
 clc; clearvars; close all;
 
-clc; clearvars; close all;
-
 % Load preprocessed test data.
 load("../../data/preprocessed/preprocessed_training_data.mat")
 
