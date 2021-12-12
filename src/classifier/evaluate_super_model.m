@@ -30,7 +30,16 @@ parfor data_index = 1:samples
     end
 end
 
+
 min_maxed_scores = min_max_columns(scores);
+
+min_values = min(scores);
+max_values = max(scores);
+min_max_mat = [min_values; max_values];
+save("../../data/model/min_max_mat.mat", "min_max_mat");
+
+% Jokaisen columin minimi ja maximi tallennetaan models kansioon
+
 
 % Pick largest score and assign it as the final class.
 [~, classification_results] = max(min_maxed_scores');

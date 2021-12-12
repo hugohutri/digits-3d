@@ -1,12 +1,14 @@
-function [processed_data, projection_matrix] = preprocess(raw_data, justified_size, image_dimensions)
+function [processed_data, projection_matrix] = preprocess(raw_data, justified_size, image_dimensions, projection_matrix)
     % Remove completedly zero entries.
     zero_cleaned_data = preprocess_clean_zeros(raw_data);
 
     % Calculate projection matrix using least square method.
     % Projection matrix should be saved so it can also be used for the
     % samples that arrive for classification.
-    projection_matrix = preprocess_calculate_projection_matrix(zero_cleaned_data);
-    
+    if (~projection_matrix)
+        projection_matrix = preprocess_calculate_projection_matrix(zero_cleaned_data);
+    end
+
     % Flatten data using projection matrix.
     flattened_data = preprocess_project_data(zero_cleaned_data, projection_matrix);
 
