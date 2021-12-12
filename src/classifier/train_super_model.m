@@ -3,33 +3,49 @@ clc; clearvars; close all;
 % Load preprocessed test data.
 load("../../data/preprocessed/preprocessed_training_data.mat")
 
-figure_axes = cell(10, 1, 1);
+% Train 3 times for super model forest.
+for round = 1:3
+    figure_axes = cell(10, 1, 1);
 
-% Open 10 figures.
-for index = 1:10
-    subplot_axes = cell(4, 1, 1);
-    subplot_axes{1} = figure;
-    sgtitle("Training #" + index);
-    subplot_axes{2} = subplot(3,1,1);
-    title("Accuracy");
-    ylabel("%");
-    subplot_axes{3} = subplot(3,1,2);
-    title("Test accuracy");
-    ylabel("%");
-    subplot_axes{4} = subplot(3,1,3);
-    title("Epoch duration");
-    ylabel("seconds");
-    figure_axes{index} = subplot_axes;
-    drawnow
-end
-
-% Train all specialist models.
-% Note 0 is 10 in classes.
-figure_queue = parallel.pool.DataQueue;
-figure_queue.afterEach(@(parameters) update_figures(figure_axes, parameters));
-parfor index = 1:10
-    % Start training.
-    train_model(data, classes, index, figure_queue);
+    % Open 10 figures.
+    for index = 1:10
+        subplot_axes = cell(4, 1, 1);
+        subplot_axes{1} = figure;
+        sgtitle("Training #" + index);
+        subplot_axes{2} = subplot(3,1,1);
+        title("Accuracy");
+        ylabel("%");
+        subplot_axes{3} = subplot(3,1,2);
+        title("Test accuracy");
+        ylabel("%");
+        subplot_axes{4} = subplot(3,1,3);
+        title("Epoch duration");
+        ylabel("seconds");
+        figure_axes{index} = subplot_axes;
+        drawnow
+    end
+    
+    % Train all specialist models.
+    % Note 0 is 10 in classes.
+    figure_queue = parallel.pool.DataQueue;
+    figure_queue.afterEach(@(parameters) update_figures(figure_axes, parameters));
+    parfor index = 1:10
+        % Generate model save name.
+        save_name = "NN_" + index + "_" + round;
+        
+        % Start training.
+        train_model(data, classes, index, figure_queue, save_name);
+    end
+    
+    % Save all figures.
+    for index = 1:10
+        save_name = "NN_" + index + "_" + round;
+        
+        saveas(figure_axes{index}{1}, "../../data/figures/" + save_name + ".svg")
+    end
+    
+    % Close all figures.
+    close all;
 end
 
 function update_figures(figure_axes, parameters)

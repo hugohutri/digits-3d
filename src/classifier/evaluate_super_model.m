@@ -8,15 +8,14 @@ models = cell(10, 1, 1);
 % Load all models.
 for model_number = 1:10
     load("../../data/model/NN_" + model_number + ".mat")
-    models{model_number} = best_child;
+    models{model_number} = all_time_best_child;
 end
 
 % Evaluate all data.
 [pixels, samples] = size(data);
-classification_results = zeros(1, length(classes));
 models_constant = parallel.pool.Constant(models);
+scores = zeros(samples, 10);
 parfor data_index = 1:samples
-    scores = zeros(10, 1);
     % Using all models.
     for model_index = 1:10
         model = models_constant.Value{model_index};
@@ -24,18 +23,20 @@ parfor data_index = 1:samples
         
         % Take only second output assuming it is higher than the first.
         if all_results(1) < all_results(2)
-            scores(model_index) = all_results(2);
+            scores(data_index, model_index) = all_results(2);
         else
-            scores(model_index) = 0;
+            scores(data_index, model_index) = 0;
         end
     end
-    
-    % Pick largest score and assign it as the final class.
-    [~, selected_class] = max(scores);
-    
-    % Add selected class to classification results.
-    classification_results(data_index) = selected_class;
 end
+
+min_maxed_scores = min_max_columns(scores);
+
+% Pick largest score and assign it as the final class.
+[~, classification_results] = max(min_maxed_scores');
+
+% Debug classification matrix.
+debug_matrix = [min_maxed_scores, classification_results'];
 
 % Calculate overall classification error.
 errors = sum(classes ~= classification_results);

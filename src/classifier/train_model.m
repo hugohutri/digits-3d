@@ -1,4 +1,4 @@
-function train_model(data, classes, number_to_specialize, figure_queue, figure_axes)
+function train_model(data, classes, number_to_specialize, figure_queue, save_name)
     %% Class manipulation for specialist learning
     % Manipulate classes so that special number has class 2
     % and rest numbers have class 1.
@@ -35,7 +35,7 @@ function train_model(data, classes, number_to_specialize, figure_queue, figure_a
     learn_rate = initial_learn_rate;
     
     % Error weights
-    target_error = 30;
+    target_error = 10;
     other_error = 1;
     error_pot = target_sample_amount * target_error + other_data_size * other_error;
     
@@ -44,7 +44,7 @@ function train_model(data, classes, number_to_specialize, figure_queue, figure_a
     
     % Stop learning, if test success rate drops bellow threshold
     % and epochs are greater than epoch limit.
-    test_limit_percentage = 85;
+    test_limit_percentage = 80;
     test_limit_epoch = 170;
     last_x_average = 30;
     
@@ -169,14 +169,13 @@ function train_model(data, classes, number_to_specialize, figure_queue, figure_a
         top_test_accuracies = (1 - (child_test_scores(sorted_child_index(1:3)) ./ number_of_test)) * 100;
         
         % Check is the best ever child.
-        combined_accuracy = (top_accuracies(1) + top_test_accuracies(1)) / 2;
-        if (top_accuracies(1) + top_test_accuracies(1) > all_time_best_accuracy)
-            fprintf("NEW EINSTAIN DETECTED ON #%d ON #%d WITH COMBINED SCORE: %0.1f%%\n", number_to_specialize, epoch, combined_accuracy)
+        if (top_accuracies(1) > all_time_best_accuracy && top_test_accuracies(1) >= test_limit_percentage)
+            fprintf("NEW EINSTAIN DETECTED ON #%d ON EPOCH #%d WITH SCORE: %0.1f%%\n", number_to_specialize, epoch, top_accuracies(1))
             all_time_best_child = best_child;
-            all_time_best_accuracy = top_accuracies(1) + top_test_accuracies(1);
+            all_time_best_accuracy = top_accuracies(1);
             
             % Saving
-            save("../../data/model/NN_" + number_to_specialize + ".mat", "all_time_best_child");
+            save("../../data/model/" + save_name + ".mat", "all_time_best_child");
         end
         
         % Stopping the timer
