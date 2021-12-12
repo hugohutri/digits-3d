@@ -20,17 +20,11 @@ function pixelized_data = preprocess_pixelizer(data, dimensions)
         % Go through every datapoint.
         for data_point = 1:length(entry)
             entry_point = entry(data_point, :);
-            
-            % Original way of calculating pixels
-            % % Calculate pixel coordinates.
-            % x = round(entry_point(1) * dimensions) + 1;
-            % y = round(entry_point(2) * dimensions) + 1;
-            % pixel_matrix(x, y) = 1;
 
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % Calculate pixel coordinates with anti-aliasing:
-            %
-            % Sorry about this mess
-            %
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
             % Position of the pixel as floating point number
             x_float = entry_point(1) * round_dimensions + 1;
             y_float = entry_point(2) * round_dimensions + 1;
@@ -59,10 +53,6 @@ function pixelized_data = preprocess_pixelizer(data, dimensions)
                 pixel_matrix(x+x_dir, y+y_dir) = max(pixel_matrix(x+x_dir, y+y_dir), 2*hypot(x_diff, y_diff));
             end
 
-            % % Anti-aliasing by roni
-            % x = round(entry_point(1) * round_dimensions) + 1;
-            % y = round(entry_point(2) * round_dimensions) + 1;
-            % pixel_matrix(x, y) = pixel_matrix(x, y) + 1;
         end
         
         % Limit the values between 0 and 1

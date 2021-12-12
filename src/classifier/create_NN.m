@@ -1,5 +1,4 @@
 function NN = create_NN(input_size, hidden_size, hidden_layers, output_size)
-
     
     % CHILD -class
     %

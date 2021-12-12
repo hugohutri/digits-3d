@@ -33,12 +33,13 @@ end
 
 min_maxed_scores = min_max_columns(scores);
 
+% Save min and max values of each score, 
+% so those can be used to scale the result when using digit_classify
 min_values = min(scores);
 max_values = max(scores);
 min_max_mat = [min_values; max_values];
 save("../../data/model/min_max_mat.mat", "min_max_mat");
 
-% Jokaisen columin minimi ja maximi tallennetaan models kansioon
 
 
 % Pick largest score and assign it as the final class.

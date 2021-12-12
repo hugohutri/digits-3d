@@ -1,4 +1,6 @@
 function justified_data = preprocess_justify_data(data, desired_length)
+    % Justify the data vector to new size
+
     global DEBUG;
     global DEBUG_DRAW_EVERY;
     FUNCTION_DEBUG = 0;

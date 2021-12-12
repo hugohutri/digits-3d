@@ -1,4 +1,6 @@
 function debug_draw_vectors(data, classes)
+    % Draw images from vector data
+
     global DEBUG;
     global DEBUG_DRAW_EVERY;
     

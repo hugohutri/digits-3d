@@ -1,4 +1,10 @@
 function [data, classes, max_length] = load_data(path_to_data)
+    % Load data for training or testing
+    % 
+    % USAGE:
+    %   [data, classes, max_length] = load_data(path_to_data);
+    
+
     global TRAIN_DATA_SIZE;
     global TRAIN_DATA_CLASS_INDEX;
 

@@ -1,5 +1,4 @@
 function children = create_cross_children(top_children, base_NN, mutation_rate, mutation_multpl)
-    % fprintf("Creating children\n")
     % Create_children(parent, child_count, learn_rate, limits, use_gauss)
 
     children = [];

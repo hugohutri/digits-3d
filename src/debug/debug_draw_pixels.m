@@ -1,4 +1,8 @@
 function debug_draw_pixels(data, classes)
+    % Draw (pixel) images
+    % USAGE:
+    %   debug_draw_pixels(data, classes)
+
     global DEBUG;
     global DEBUG_DRAW_EVERY;
     global DEBUG_DRAW_CLASSES;

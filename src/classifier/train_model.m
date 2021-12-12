@@ -151,9 +151,8 @@ function train_model(data, classes, number_to_specialize, figure_queue, save_nam
             end
         end
 
-        % Rank the children
+        % Rank the children based on the training scores
         [sorted_child, sorted_child_index] = sort(child_train_scores);
-
         top_children = child_list( sorted_child_index(1:num_top_child) );
 
         if sorted_child(1) < best_child_score
@@ -162,7 +161,7 @@ function train_model(data, classes, number_to_specialize, figure_queue, save_nam
             best_child = child_list( sorted_child_index(1) );
         end
         
-        % Next epoch child list.
+        % Create new generation (list of childs) for next epoch
         child_list = create_cross_children(top_children, base_NN, mutation_rate, mutation_multpl);
         
         top_accuracies = (1 - (sorted_child(1:3) ./ error_pot)) * 100;
@@ -170,7 +169,7 @@ function train_model(data, classes, number_to_specialize, figure_queue, save_nam
         
         % Check is the best ever child.
         if (top_accuracies(1) > all_time_best_accuracy && top_test_accuracies(1) >= test_limit_percentage)
-            fprintf("NEW EINSTAIN DETECTED ON #%d ON EPOCH #%d WITH SCORE: %0.1f%%\n", number_to_specialize, epoch, top_accuracies(1))
+            fprintf("NEW EINSTEIN DETECTED ON #%d ON EPOCH #%d WITH SCORE: %0.1f%%\n", number_to_specialize, epoch, top_accuracies(1))
             all_time_best_child = best_child;
             all_time_best_accuracy = top_accuracies(1);
             
@@ -187,7 +186,9 @@ function train_model(data, classes, number_to_specialize, figure_queue, save_nam
         
         epoch_durations = [epoch_durations t_delta];
 
-        % PLOTTING
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %% PLOTTING
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         best_epoch_accuracies = [best_epoch_accuracies, top_accuracies(1)];
         best_epoch_test_accuracies = [best_epoch_test_accuracies, top_test_accuracies(1)];
@@ -213,7 +214,5 @@ function train_model(data, classes, number_to_specialize, figure_queue, save_nam
             break;
         end
         
-        % Calculate new learning rate.
-        learn_rate = initial_learn_rate * (learn_rate_modifier / top_accuracies(1));
     end
 end

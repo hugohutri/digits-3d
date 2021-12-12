@@ -1,15 +1,8 @@
 function children = create_all_children(top_children, best_child, learn_rate, base_NN)
-    % fprintf("Creating children\n")
     % Create_children(parent, child_count, learn_rate, limits, use_gauss)
 
     children = [];
 
-    % % Create 2 children for top 50 children
-    % % -> 100 children
-    % for i = 1:length(top_children)
-    %     new_children = create_children(top_children(i), 2, learn_rate);
-    %     children = [children new_children];
-    % end
 
     % Create 2 children for top 1-20 children
     % -> 40

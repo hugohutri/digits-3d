@@ -1,18 +1,22 @@
 function children = create_cross(parent_1, parent_2, mutation_rate, mutation_multpl)
-    
+    % Linear crossover to create 3 new children for 2 parents
     % Returns always 3 children, all of which should be utilized
 
     children = Child.empty(3, 0);
     
+    % First child has 50% genes of both parents
     children(1) = multiply_with(parent_1, parent_2, 0.5, 0.5);
     
+    % Second child prioritizes the parent 1
     children(2) = multiply_with(parent_1, parent_2, 3/2, -0.5);
     
+    % Thirt child prioritizes the parent 2
     children(3) = multiply_with(parent_1, parent_2, -0.5, 3/2);
     
     
     function child = multiply_with(parent_1, parent_2, mult_1, mult_2)
-        
+        % Create the new child based on parents and the multipliers
+
         child = Child;
         
         child.weights_in = apply_random( (mult_1 .* parent_1.weights_in) + (mult_2 .* parent_2.weights_in));
@@ -25,6 +29,7 @@ function children = create_cross(parent_1, parent_2, mutation_rate, mutation_mul
         child.bias_out    = apply_random( (mult_1 .* parent_1.bias_out)    + (mult_2 .* parent_2.bias_out));
     end
 
+    % Apply random variation to the child based on the parent
     function mat = apply_random(parent_mat)
         
         p_size = size(parent_mat);

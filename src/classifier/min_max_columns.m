@@ -1,4 +1,5 @@
 function min_maxed_data = min_max_columns(data)
+    
     % Get row and column amount.
     [~, columns] = size(data);
 

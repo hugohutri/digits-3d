@@ -1,4 +1,8 @@
 function projection_matrix = preprocess_calculate_projection_matrix(data)  
+    % Calculate projection matrix where data points will be projected into
+    % USAGE:
+    %   projection_matrix = preprocess_calculate_projection_matrix(data)
+
     % Define neutral projection matrix.
     neutral_projection_matrix = eye(3, 3);
     % Define vector that converts normal vector into projection matrix

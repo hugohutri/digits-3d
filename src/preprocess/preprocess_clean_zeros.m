@@ -1,5 +1,6 @@
-% Clean completedly zero lines from the data.
 function cleaned_data = preprocess_clean_zeros(data)
+    % Clean completedly zero lines from the data.
+
     % Prepare cleaned data output by assigning certain size table.
     cleaned_data = cell(length(data), 1, 1);
 

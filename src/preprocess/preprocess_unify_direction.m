@@ -1,6 +1,8 @@
-% Unify direction of the data so that drawing always starts from the
-% same direction.
+
 function unified_data = preprocess_unify_direction(data)
+    % Unify direction of the data so that drawing always starts from the
+    % same direction.
+
     % Define sensitivity of the flip operation.
     flip_sensitivity = 0.3;
 

@@ -39,5 +39,6 @@ debug_draw_pixels(preprocessed_data, classes)
 
 classes(classes == 0) = 10;
 
+% Save the data as vector
 save_data(preprocessed_data, classes', "data/preprocessed", "preprocessed_training_data.mat")
 save("data/model/projection_matrix.mat", "projection_matrix")

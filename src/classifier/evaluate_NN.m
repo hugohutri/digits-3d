@@ -1,5 +1,10 @@
 
-function result = evaluate_NN(child, input, layer_N)       
+function result = evaluate_NN(child, input, layer_N) 
+    % Evaluate the neural network
+    % USAGE:
+    %   result = evaluate_NN(child, input, layer_N)
+
+    % ReLU function as activation function
     activ_fun = @(X) max(zeros(size(X)), X);
 
     % INPUT

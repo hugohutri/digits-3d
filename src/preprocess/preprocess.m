@@ -1,4 +1,14 @@
 function [processed_data, projection_matrix] = preprocess(raw_data, justified_size, image_dimensions, projection_matrix)
+    % Handle every preprocessing to be done to the data
+    % USAGE:
+    %   [processed_data, projection_matrix] = preprocess(raw_data, justified_size, image_dimensions, projection_matrix)
+    % 
+    % WHERE:
+    %   raw_data: the actual data to be preprocessed
+    %   justified_size: constant size to strech the data vector, for example. 2000
+    %   image_dimensions: Dimensions of the output image. For example 32 (-> 32x32)
+    %   projection_matrix: (Optional) Pre-determined projection matrix to be used. This should be left empty when dealing with new dataset, but can be included when testing the classificator
+
     % Remove completedly zero entries.
     zero_cleaned_data = preprocess_clean_zeros(raw_data);
 

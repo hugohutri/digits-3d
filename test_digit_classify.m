@@ -21,7 +21,8 @@ LOAD_DATA_ENABLED = true;
 if LOAD_DATA_ENABLED
     [data, classes, max_length] = load_data(TRAIN_DATA_DIRECTORY);
 end
-
-for i = 100:150
-    class = digit_classify(data{i})
+tic
+for i = 100:200
+    class = digit_classify(data{i});
 end
+toc

@@ -49,6 +49,9 @@ for round = 1:3
 end
 
 function update_figures(figure_axes, parameters)
+    % USAGE:
+    %   update_figures(figure_axes, parameters);
+
     number_to_specialize = parameters{1};
     epoch = parameters{2};
     best_epoch_accuracies = parameters{3};
