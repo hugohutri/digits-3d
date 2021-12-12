@@ -14,7 +14,7 @@ function children = create_cross_children(top_children, base_NN, mutation_rate, 
     
     
     pair_count = 33;
-    
+    % Generate random pairs where r1 and r2 combined result in pairs
     r1 = ceil( abs(randn(1, pair_count)) * n );
     r2 = ceil( abs(randn(1, pair_count)) * n );
     
@@ -28,7 +28,7 @@ function children = create_cross_children(top_children, base_NN, mutation_rate, 
     
     
     same = s1 == s2;
-
+    % Breeding with oneself is not allowed, so index gets raised by one
     s2(same == 1) = s2(same == 1) + 1;
     
     s2(s2 > 110) = 110;
@@ -45,12 +45,9 @@ function children = create_cross_children(top_children, base_NN, mutation_rate, 
 
     % 11 purely random children
     child_list_random = create_children(base_NN, 10, 100, [-1e1, 1e1], false);
-    %
 
-    % children = [children child_list_best child_list_random];
 
     % Add all children together
     % -> 100 + 10 = 110
     children = [children child_list_random top_children(1)];
-    % fprintf("Children created\n")
 end

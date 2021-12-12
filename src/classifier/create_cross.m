@@ -16,7 +16,8 @@ function children = create_cross(parent_1, parent_2, mutation_rate, mutation_mul
     
     function child = multiply_with(parent_1, parent_2, mult_1, mult_2)
         % Create the new child based on parents and the multipliers
-
+        
+        % Each matrix and vectors get's the apply_random() treatment
         child = Child;
         
         child.weights_in = apply_random( (mult_1 .* parent_1.weights_in) + (mult_2 .* parent_2.weights_in));
@@ -35,9 +36,11 @@ function children = create_cross(parent_1, parent_2, mutation_rate, mutation_mul
         p_size = size(parent_mat);
         dims = length(p_size);
         
-        
+        % Number of mutations per matrix or vector, which is scaled by the
+        % dimesion
         num_of_muts = round(abs(randn()) * mutation_rate) * dims;
         
+        % x, y, z position of the mutation
         rnd_x = randi([1, p_size(1)], 1, num_of_muts);
         rnd_y = randi([1, p_size(2)], 1, num_of_muts);
         if (dims > 2)
@@ -48,6 +51,7 @@ function children = create_cross(parent_1, parent_2, mutation_rate, mutation_mul
         mat = zeros(p_size);
         for p = 1:num_of_muts
             
+            % Applying each mutation one by one
             x = rnd_x(p);
             y = rnd_y(p);
             if (dims > 2)
@@ -62,14 +66,3 @@ function children = create_cross(parent_1, parent_2, mutation_rate, mutation_mul
         mat = mat + parent_mat;
     end
 end
-
-% CHILD -class
-%
-% weights_in (:,:) double
-% bias_in (:,:) double
-%
-% weights_hidden (:,:) double
-% bias_hidden (:,:) double
-%
-% weights_out (:,:) double
-% bias_out (:,:) double
